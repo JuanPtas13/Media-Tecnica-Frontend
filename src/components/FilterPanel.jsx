@@ -39,7 +39,7 @@ export default function FilterPanel({
                 >
                   <option value="">Todos</option>
                   {filter.options?.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
+                    <option key={String(opt.value)} value={opt.value}>
                       {opt.label}
                     </option>
                   ))}
