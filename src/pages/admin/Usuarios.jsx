@@ -12,21 +12,23 @@ export default function UsuariosPage() {
   const [roles, setRoles] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [userToChangePassword, setUserToChangePassword] = useState(null);
+  const [newPassword, setNewPassword] = useState("");
   const [initialLoading, setInitialLoading] = useState(true);
 
   const { call: loadUsers, loading: loadingUsers } = useApiCall();
   const { call: loadRoles } = useApiCall();
   const { call: saveUser, loading: savingUser } = useApiCall();
   const { call: deleteUser, loading: deletingUser } = useApiCall();
+  const { call: changePassword, loading: changingPassword } = useApiCall();
 
-  const { filtered, searchTerm, setSearchTerm, filters, setFilters } = useFilters(
+  const { filtered, setSearchTerm, filters, setFilters } = useFilters(
     users,
     (item, filterObj) => {
-      // ✅ rol_id es número
       if (filterObj.rol && item.rol_id !== Number(filterObj.rol)) return false;
-      // ✅ estado es booleano
       if (filterObj.estado !== undefined && filterObj.estado !== "") {
         if (item.estado !== (filterObj.estado === "true")) return false;
       }
@@ -42,7 +44,7 @@ export default function UsuariosPage() {
       correo: "",
       rol_id: "",
       estado: true,
-      contraseña: "",
+      contrasena: "",
     },
     handleSubmit
   );
@@ -58,7 +60,6 @@ export default function UsuariosPage() {
         loadUsers("/usuarios", { method: "GET" }),
         loadRoles("/roles", { method: "GET" }),
       ]);
-      // Extraer arrays correctamente
       setUsers(usersData?.data || []);
       setRoles(rolesData?.data || []);
     } catch (error) {
@@ -70,24 +71,22 @@ export default function UsuariosPage() {
 
   async function handleSubmit(values) {
     try {
-      if (!editingUser && !values.contraseña) {
+      if (!editingUser && !values.contrasena) {
         alert("La contraseña es requerida para nuevos usuarios");
         return;
       }
-      const dataToSave = { ...values };
-      if (editingUser && !dataToSave.contraseña) {
-        delete dataToSave.contraseña;
-      }
 
       if (editingUser) {
+        // ✅ Al editar NO se envía contraseña, endpoint separado
+        const { contrasena, ...dataToSave } = values;
         await saveUser(`/usuarios/${editingUser.id_usuario}`, {
           method: "PUT",
           body: JSON.stringify(dataToSave),
         });
       } else {
-        await saveUser("/usuarios", {
+        await saveUser("/usuarios/", {
           method: "POST",
-          body: JSON.stringify(dataToSave),
+          body: JSON.stringify(values),
         });
       }
       await loadInitialData();
@@ -99,9 +98,27 @@ export default function UsuariosPage() {
     }
   }
 
+  async function handleChangePassword() {
+    if (!newPassword) {
+      alert("Ingresa la nueva contraseña");
+      return;
+    }
+    try {
+      await changePassword(`/usuarios/${userToChangePassword.id_usuario}/contrasena`, {
+        method: "PUT",
+        body: JSON.stringify({ nueva_contrasena: newPassword }),
+      });
+      setShowPasswordModal(false);
+      setNewPassword("");
+      setUserToChangePassword(null);
+    } catch (error) {
+      console.error("Error cambiando contraseña:", error);
+    }
+  }
+
   function handleEditClick(user) {
     setEditingUser(user);
-    form.setValues({ ...user, contraseña: "" });
+    form.setValues({ ...user, contrasena: "" });
     setShowModal(true);
   }
 
@@ -110,9 +127,14 @@ export default function UsuariosPage() {
     setShowDeleteModal(true);
   }
 
+  function handleChangePasswordClick(user) {
+    setUserToChangePassword(user);
+    setNewPassword("");
+    setShowPasswordModal(true);
+  }
+
   async function handleConfirmDelete() {
     try {
-      // ✅ Usar id_usuario
       await deleteUser(`/usuarios/${userToDelete.id_usuario}`, {
         method: "DELETE",
       });
@@ -134,17 +156,15 @@ export default function UsuariosPage() {
     { key: "nombre", label: "Nombre" },
     { key: "apellido1", label: "Primer Apellido" },
     { key: "apellido2", label: "Segundo Apellido" },
-    { key: "correo", label: "Correo" },  
+    { key: "correo", label: "Correo" },
     {
       key: "estado",
       label: "Estado",
       render: (value) => (
         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-          value === true
-            ? "bg-green-100 text-green-700"
-            : "bg-red-100 text-red-700"
+          value === true ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
         }`}>
-          {value === true ? "Activo" : "Inactivo"}  
+          {value === true ? "Activo" : "Inactivo"}
         </span>
       ),
     },
@@ -171,15 +191,14 @@ export default function UsuariosPage() {
             key: "rol",
             label: "Rol",
             type: "select",
-            // ✅ Cuando tengas los campos de roles, ajusta r.id_rol y r.nombre
-            options: roles.map((r) => ({ label: r.nombre, value: r.id_rol })),
+            options: roles.map((r) => ({ label: r.nombre, value: r.id_roles })),
           },
           {
             key: "estado",
             label: "Estado",
             type: "select",
             options: [
-              { label: "Activo", value: "true" },    // ✅ booleano como string
+              { label: "Activo", value: "true" },
               { label: "Inactivo", value: "false" },
             ],
           },
@@ -193,9 +212,18 @@ export default function UsuariosPage() {
         loading={loadingUsers || initialLoading}
         onEdit={handleEditClick}
         onDelete={handleDeleteClick}
+        // ✅ Acción extra para cambiar contraseña
+        extraActions={[
+          {
+            label: "🔑 Contraseña",
+            onClick: handleChangePasswordClick,
+            className: "text-yellow-600 hover:text-yellow-800",
+          },
+        ]}
         itemsPerPage={10}
       />
 
+      {/* Modal editar/crear usuario */}
       <FormModal
         isOpen={showModal}
         title={editingUser ? "Editar Usuario" : "Nuevo Usuario"}
@@ -266,27 +294,27 @@ export default function UsuariosPage() {
             >
               <option value="">Seleccionar rol</option>
               {roles.map((r) => (
-                <option key={r.id_rol} value={r.id_rol}>
+                <option key={r.id_roles} value={r.id_roles}>
                   {r.nombre}
                 </option>
               ))}
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Contraseña {editingUser ? "" : "*"}
-            </label>
-            <input
-              type="password"
-              name="contraseña"
-              value={form.values.contraseña}
-              onChange={form.handleChange}
-              placeholder={editingUser ? "Dejar en blanco para no cambiar" : ""}
-              required={!editingUser}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          {/* ✅ Contraseña solo al crear */}
+          {!editingUser && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña *</label>
+              <input
+                type="password"
+                name="contrasena"
+                value={form.values.contrasena}
+                onChange={form.handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
@@ -299,6 +327,37 @@ export default function UsuariosPage() {
               <option value={true}>Activo</option>
               <option value={false}>Inactivo</option>
             </select>
+          </div>
+        </div>
+      </FormModal>
+
+      {/* ✅ Modal cambiar contraseña */}
+      <FormModal
+        isOpen={showPasswordModal}
+        title={`Cambiar contraseña — ${userToChangePassword?.nombre}`}
+        onClose={() => {
+          setShowPasswordModal(false);
+          setNewPassword("");
+          setUserToChangePassword(null);
+        }}
+        onSubmit={handleChangePassword}
+        loading={changingPassword}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Ingresa la nueva contraseña para <strong>{userToChangePassword?.nombre} {userToChangePassword?.apellido1}</strong>.
+          </p>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nueva Contraseña *
+            </label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
         </div>
       </FormModal>

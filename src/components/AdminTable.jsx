@@ -1,7 +1,7 @@
 // AdminTable Component
 // Tabla reutilizable para mostrar datos con acciones (editar/eliminar)
 
-import { useState } from "react";
+import { act, useState } from "react";
 
 /**
  * Tabla administrativa genérica
@@ -20,6 +20,7 @@ export default function AdminTable({
   onDelete,
   loading = false,
   itemsPerPage = 10,
+  extraActions = [],
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -108,10 +109,10 @@ export default function AdminTable({
                   </div>
                 </th>
               ))}
-              {(onEdit || onDelete) && (
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              {(onEdit || onDelete || extraActions.length > 0) && (
+                <td className="px-6 py-4 text-sm">
                   Acciones
-                </th>
+                </td>
               )}
             </tr>
           </thead>
@@ -130,7 +131,7 @@ export default function AdminTable({
                       : row[column.key]}
                   </td>
                 ))}
-                {(onEdit || onDelete) && (
+                {(onEdit || onDelete || extraActions.length > 0) && (
                   <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
                       {onEdit && (
@@ -149,6 +150,15 @@ export default function AdminTable({
                           Eliminar
                         </button>
                       )}
+                      {extraActions.map((action, i) => (
+                        <button
+                          key={i}
+                          onClick={() => action.onClick(row)}
+                          className={`px-3 py-1 rounded transition-colors duration-200 text-xs font-medium bg-yellow-50 text-yellow-600 hover:bg-yellow-100 ${action.className || ""}`}
+                        >
+                          {action.label}
+                        </button>
+                      ))}
                     </div>
                   </td>
                 )}

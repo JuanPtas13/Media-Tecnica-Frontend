@@ -12,6 +12,13 @@ import RegistrosPage from "./pages/admin/Registros";
 import GradosPage from "./pages/admin/Grados";
 import RolesPage from "./pages/admin/Roles";
 import ConfiguracionPage from "./pages/admin/Configuracion";
+import DocentePanel from "./pages/docente/DocentePanel";
+import DocenteDashboard from "./pages/docente/DocenteDashboard";
+import DocenteRegistros from "./pages/docente/Registros";
+import DocenteReportes from "./pages/docente/Reportes";
+import VigilantePanel from "./pages/vigilante/VigilantePanel";
+import VigilanteDashboard from "./pages/vigilante/VigilanteDashboard";
+import RegistrarIngreso from "./pages/vigilante/RegistrarIngreso";
 
 function App() {
   return (
@@ -49,32 +56,30 @@ function App() {
             path="/docente/*"
             element={
               <ProtectedRoute requiredRole="docente" showAccessDenied>
-                <div className="p-8">
-                  <h1 className="text-3xl font-bold">Panel de Docente</h1>
-                  <p>Bienvenido al dashboard de docente</p>
-                  <div className="mt-4 p-4 bg-green-100 rounded">
-                    <p>Solo los docentes pueden ver esta página.</p>
-                  </div>
-                </div>
+                <DocentePanel />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<DocenteDashboard />} />
+            <Route path="dashboard" element={<DocenteDashboard />} />
+            <Route path="registros" element={<DocenteRegistros />} />
+            <Route path="reportes" element={<DocenteReportes />} />
+          </Route>
+          
 
           {/* VIGILANTE - Solo para usuarios con rol 'vigilante' */}
           <Route
             path="/vigilante/*"
             element={
               <ProtectedRoute requiredRole="vigilante" showAccessDenied>
-                <div className="p-8">
-                  <h1 className="text-3xl font-bold">Panel de Vigilante</h1>
-                  <p>Bienvenido al dashboard de vigilante</p>
-                  <div className="mt-4 p-4 bg-purple-100 rounded">
-                    <p>Solo los vigilantes pueden ver esta página.</p>
-                  </div>
-                </div>
+                <VigilantePanel />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<VigilanteDashboard />} />
+            <Route path="dashboard" element={<VigilanteDashboard />} />
+            <Route path="registrar" element={<RegistrarIngreso />} />
+          </Route>
 
           {/* ============== RUTAS POR DEFECTO ============== */}
           {/* Redirección de inicio a login */}

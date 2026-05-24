@@ -6,12 +6,7 @@ import AdminTable from "../../components/AdminTable";
 import FormModal from "../../components/FormModal";
 import ConfirmModal from "../../components/ConfirmModal";
 import FilterPanel from "../../components/FilterPanel";
-import { estudiantesService } from "../../services/estudiantesService";
-import { gradosService } from "../../services/gradosService";
 
-/**
- * Página de gestión de estudiantes
- */
 export default function EstudiantesPage() {
   const [students, setStudents] = useState([]);
   const [grades, setGrades] = useState([]);
@@ -26,11 +21,13 @@ export default function EstudiantesPage() {
   const { call: saveStudent, loading: savingStudent } = useApiCall();
   const { call: deleteStudent, loading: deletingStudent } = useApiCall();
 
-  const { filtered, searchTerm, setSearchTerm, filters, setFilters } = useFilters(
+  const { filtered, setSearchTerm, filters, setFilters } = useFilters(
     students,
     (item, filterObj) => {
-      if (filterObj.grado && item.grado !== filterObj.grado) return false;
-      if (filterObj.estado && item.estado !== filterObj.estado) return false;
+      if (filterObj.grado && item.grado_id !== Number(filterObj.grado)) return false;
+      if (filterObj.estado !== undefined && filterObj.estado !== "") {
+        if (item.estado !== (filterObj.estado === "true")) return false;
+      }
       return true;
     }
   );
@@ -38,15 +35,15 @@ export default function EstudiantesPage() {
   const form = useForm(
     {
       nombre: "",
-      apellido: "",
-      email: "",
-      grado: "",
-      estado: "activo",
+      apellido1: "",
+      apellido2: "",
+      documento: "",
+      grado_id: "",
+      estado: true,
     },
     handleSubmit
   );
 
-  // Cargar datos iniciales
   useEffect(() => {
     loadInitialData();
   }, []);
@@ -58,9 +55,8 @@ export default function EstudiantesPage() {
         loadStudents("/estudiantes", { method: "GET" }),
         loadGrades("/grados", { method: "GET" }),
       ]);
-
       setStudents(studentsData?.data?.estudiantes || []);
-      setGrades(gradesData?.data?.grados || gradesData?.data || []);
+      setGrades(gradesData?.data || []);
     } catch (error) {
       console.error("Error cargando datos:", error);
     } finally {
@@ -71,9 +67,9 @@ export default function EstudiantesPage() {
   async function handleSubmit(values) {
     try {
       if (editingStudent) {
-        await saveStudent("/estudiantes", {
+        await saveStudent(`/estudiantes/${editingStudent.id_estudiante}`, {
           method: "PUT",
-          body: JSON.stringify({ ...values, id: editingStudent.id }),
+          body: JSON.stringify(values),
         });
       } else {
         await saveStudent("/estudiantes", {
@@ -92,7 +88,14 @@ export default function EstudiantesPage() {
 
   function handleEditClick(student) {
     setEditingStudent(student);
-    form.setValues(student);
+    form.setValues({
+      nombre: student.nombre,
+      apellido1: student.apellido1,
+      apellido2: student.apellido2,
+      documento: student.documento,
+      grado_id: student.grado_id,
+      estado: student.estado,
+    });
     setShowModal(true);
   }
 
@@ -103,9 +106,8 @@ export default function EstudiantesPage() {
 
   async function handleConfirmDelete() {
     try {
-      await deleteStudent("/estudiantes", {
+      await deleteStudent(`/estudiantes/${studentToDelete.id_estudiante}`, {
         method: "DELETE",
-        body: JSON.stringify({ id: studentToDelete.id }),
       });
       await loadInitialData();
       setShowDeleteModal(false);
@@ -131,17 +133,16 @@ export default function EstudiantesPage() {
       label: "Estado",
       render: (value) => (
         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-        value === true ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-      }`}>
-        {value === true ? "Activo" : "Inactivo"}
-      </span>
+          value === true ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+        }`}>
+          {value === true ? "Activo" : "Inactivo"}
+        </span>
       ),
     },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Estudiantes</h1>
         <button
@@ -152,9 +153,8 @@ export default function EstudiantesPage() {
         </button>
       </div>
 
-      {/* Filtros */}
       <FilterPanel
-        searchPlaceholder="Buscar por nombre, apellido o email..."
+        searchPlaceholder="Buscar por nombre, apellido o documento..."
         onSearch={setSearchTerm}
         onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
         filters={[
@@ -162,22 +162,24 @@ export default function EstudiantesPage() {
             key: "grado",
             label: "Grado",
             type: "select",
-            options: grades.map((g) => ({ label: g.nombre, value: g.nombre })),
+            options: grades.map((g) => ({
+              label: `${g.numero_grado} - ${g.grupo}`,
+              value: g.id_grado,
+            })),
           },
           {
             key: "estado",
             label: "Estado",
             type: "select",
             options: [
-              { label: "Activo", value: "activo" },
-              { label: "Inactivo", value: "inactivo" },
+              { label: "Activo", value: "true" },
+              { label: "Inactivo", value: "false" },
             ],
           },
         ]}
         loading={loadingStudents}
       />
 
-      {/* Tabla */}
       <AdminTable
         columns={columns}
         data={filtered}
@@ -187,7 +189,6 @@ export default function EstudiantesPage() {
         itemsPerPage={10}
       />
 
-      {/* Form Modal */}
       <FormModal
         isOpen={showModal}
         title={editingStudent ? "Editar Estudiante" : "Nuevo Estudiante"}
@@ -201,92 +202,89 @@ export default function EstudiantesPage() {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nombre *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
             <input
               type="text"
               name="nombre"
               value={form.values.nombre}
               onChange={form.handleChange}
-              onBlur={form.handleBlur}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Apellido *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Primer Apellido *</label>
             <input
               type="text"
-              name="apellido"
-              value={form.values.apellido}
+              name="apellido1"
+              value={form.values.apellido1}
               onChange={form.handleChange}
-              onBlur={form.handleBlur}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Segundo Apellido</label>
             <input
-              type="email"
-              name="email"
-              value={form.values.email}
+              type="text"
+              name="apellido2"
+              value={form.values.apellido2}
               onChange={form.handleChange}
-              onBlur={form.handleBlur}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Documento *</label>
+            <input
+              type="text"
+              name="documento"
+              value={form.values.documento}
+              onChange={form.handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Grado *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Grado *</label>
             <select
-              name="grado"
-              value={form.values.grado}
+              name="grado_id"
+              value={form.values.grado_id}
               onChange={form.handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Seleccionar grado</option>
               {grades.map((g) => (
-                <option key={g.id} value={g.nombre}>
-                  {g.nombre}
+                <option key={g.id_grado} value={g.id_grado}>
+                  {g.numero_grado} - {g.grupo}
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Estado
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
             <select
               name="estado"
               value={form.values.estado}
               onChange={form.handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
+              <option value={true}>Activo</option>
+              <option value={false}>Inactivo</option>
             </select>
           </div>
         </div>
       </FormModal>
 
-      {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={showDeleteModal}
         title="Eliminar Estudiante"
-        message={`¿Estás seguro de que deseas eliminar a ${studentToDelete?.nombre}?`}
+        message={`¿Estás seguro de que deseas eliminar a ${studentToDelete?.nombre} ${studentToDelete?.apellido1}?`}
         onConfirm={handleConfirmDelete}
         onCancel={() => setShowDeleteModal(false)}
         loading={deletingStudent}

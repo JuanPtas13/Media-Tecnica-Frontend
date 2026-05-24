@@ -40,10 +40,10 @@ export default function AdminDashboard() {
         ]);
 
         setStats({
-          estudiantes: estudiantesData?.length || 0,
-          usuarios: usuariosData?.length || 0,
-          registros: registrosData?.length || 0,
-          grados: gradosData?.length || 0,
+          estudiantes: estudiantesData?.data?.estudiantes?.length || 0,
+          usuarios: usuariosData?.data?.length || 0,
+          registros: registrosData?.data?.length || 0,
+          grados: gradosData?.data?.length || 0,
         });
       } catch (err) {
         console.error("Error cargando estadísticas:", err);
