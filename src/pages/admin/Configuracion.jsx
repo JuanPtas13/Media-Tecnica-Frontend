@@ -3,6 +3,10 @@ import { useForm } from "../../hooks/useForm";
 import { useApiCall } from "../../hooks/useApiCall";
 import FormModal from "../../components/FormModal";
 
+/**
+ * Página de configuración horaria del sistema.
+ * Define los horarios de entrada, tolerancia y vigencia para la toma de asistencia.
+ */
 export default function ConfiguracionPage() {
   const [config, setConfig] = useState(null);
   const [showModal, setShowModal] = useState(false);

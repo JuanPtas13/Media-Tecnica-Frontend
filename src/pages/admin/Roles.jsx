@@ -7,6 +7,7 @@ import FormModal from "../../components/FormModal";
 import ConfirmModal from "../../components/ConfirmModal";
 import FilterPanel from "../../components/FilterPanel";
 
+// Enumeración de permisos disponibles para asignar a cada rol.
 const AVAILABLE_PERMISSIONS = [
   "crear_estudiante", "editar_estudiante", "eliminar_estudiante",
   "crear_usuario", "editar_usuario", "eliminar_usuario",
@@ -16,21 +17,37 @@ const AVAILABLE_PERMISSIONS = [
   "configurar_horarios",
 ];
 
+/**
+ * Página para configurar los roles del sistema y sus permisos.
+ * Cada rol define qué acciones puede realizar cada usuario.
+ */
 export default function RolesPage() {
+  // Lista de roles cargados desde el backend.
   const [roles, setRoles] = useState([]);
+
+  // Control de apertura de modales.
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // Guarda el rol que se está editando o eliminando.
   const [editingRole, setEditingRole] = useState(null);
   const [roleToDelete, setRoleToDelete] = useState(null);
+
+  // Control de carga inicial.
   const [initialLoading, setInitialLoading] = useState(true);
+
+  // Permisos actualmente seleccionados en el formulario.
   const [selectedPermissions, setSelectedPermissions] = useState([]);
 
+  // Servicios API reutilizables.
   const { call: loadRoles, loading: loadingRoles } = useApiCall();
   const { call: saveRole, loading: savingRole } = useApiCall();
   const { call: deleteRole, loading: deletingRole } = useApiCall();
 
+  // Búsqueda por nombre en la tabla de roles.
   const { filtered, setSearchTerm } = useFilters(roles);
 
+  // Formulario para crear o editar un rol.
   const form = useForm(
     { nombre: "", descripcion: "", permisos: [] },
     handleSubmit
@@ -40,11 +57,11 @@ export default function RolesPage() {
     loadInitialData();
   }, []);
 
+  // Carga los roles del sistema cuando se inicia la vista.
   async function loadInitialData() {
     try {
       setInitialLoading(true);
       const rolesData = await loadRoles("/roles", { method: "GET" });
-      // ✅ Extraer array correctamente
       setRoles(rolesData?.data || []);
     } catch (error) {
       console.error("Error cargando roles:", error);
@@ -53,12 +70,13 @@ export default function RolesPage() {
     }
   }
 
+  // Crea o actualiza un rol y envía los permisos seleccionados.
   async function handleSubmit(values) {
     try {
       const dataToSave = { ...values, permisos: selectedPermissions };
 
       if (editingRole) {
-        await saveRole("/roles/" + editingRole.id_roles, { // ✅ id_roles
+        await saveRole("/roles/" + editingRole.id_roles, {
           method: "PUT",
           body: JSON.stringify(dataToSave),
         });
@@ -78,10 +96,12 @@ export default function RolesPage() {
     }
   }
 
+  // Carga un rol existente para editarlo.
   function handleEditClick(role) {
     setEditingRole(role);
     form.setValues(role);
-    // ✅ permisos viene como string "all" o separado por comas, no array
+
+    // Los permisos pueden venir como texto "all" o separados por comas.
     const perms = role.permisos === "all"
       ? [...AVAILABLE_PERMISSIONS]
       : (role.permisos || "").split(",").map(p => p.trim()).filter(Boolean);
@@ -89,14 +109,16 @@ export default function RolesPage() {
     setShowModal(true);
   }
 
+  // Selecciona el rol a eliminar.
   function handleDeleteClick(role) {
     setRoleToDelete(role);
     setShowDeleteModal(true);
   }
 
+  // Elimina un rol y recarga la lista.
   async function handleConfirmDelete() {
     try {
-      await deleteRole("/roles/" + roleToDelete.id_roles, { // ✅ id_roles
+      await deleteRole("/roles/" + roleToDelete.id_roles, {
         method: "DELETE",
       });
       await loadInitialData();
@@ -107,6 +129,7 @@ export default function RolesPage() {
     }
   }
 
+  // Abre el modal para crear un rol nuevo.
   function handleOpenModal() {
     setEditingRole(null);
     form.reset();
@@ -114,6 +137,7 @@ export default function RolesPage() {
     setShowModal(true);
   }
 
+  // Agrega o quita un permiso de la lista seleccionada.
   const handlePermissionChange = (permission) => {
     setSelectedPermissions((prev) =>
       prev.includes(permission)
@@ -122,6 +146,7 @@ export default function RolesPage() {
     );
   };
 
+  // Configura columnas de la tabla para mostrar nombre, descripción y cantidad de permisos.
   const columns = [
     { key: "nombre", label: "Nombre" },
     { key: "descripcion", label: "Descripción" },

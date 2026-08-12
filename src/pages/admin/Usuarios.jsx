@@ -7,16 +7,32 @@ import FormModal from "../../components/FormModal";
 import ConfirmModal from "../../components/ConfirmModal";
 import FilterPanel from "../../components/FilterPanel";
 
+/**
+ * Página de administración de usuarios.
+ * Permite listar usuarios, cambiar de rol, crear nuevos accesos, editar datos,
+ * cambiar contraseñas y desactivar cuentas según sea necesario.
+ */
 export default function UsuariosPage() {
+  // Guarda la lista de usuarios de la base de datos para mostrarla en la tabla.
   const [users, setUsers] = useState([]);
+
+  // Guarda los roles disponibles para asignarlos a cada usuario.
   const [roles, setRoles] = useState([]);
+
+  // Controla la apertura de los distintos modales de la pantalla.
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  // Permite saber si se está creando o editando un usuario.
   const [editingUser, setEditingUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
   const [userToChangePassword, setUserToChangePassword] = useState(null);
+
+  // Guarda la nueva contraseña antes de enviarla al backend.
   const [newPassword, setNewPassword] = useState("");
+
+  // Indica si se está cargando la información inicial de la pantalla.
   const [initialLoading, setInitialLoading] = useState(true);
 
   const { call: loadUsers, loading: loadingUsers } = useApiCall();
@@ -53,6 +69,7 @@ export default function UsuariosPage() {
     loadInitialData();
   }, []);
 
+  // Carga los usuarios y los roles disponibles cuando se entra a la página.
   async function loadInitialData() {
     try {
       setInitialLoading(true);
@@ -69,6 +86,7 @@ export default function UsuariosPage() {
     }
   }
 
+  // Crea un usuario nuevo o actualiza uno existente según el modo de edición.
   async function handleSubmit(values) {
     try {
       if (!editingUser && !values.contrasena) {

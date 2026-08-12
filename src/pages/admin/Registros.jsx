@@ -4,16 +4,29 @@ import { useFilters } from "../../hooks/useFilters";
 import AdminTable from "../../components/AdminTable";
 import FilterPanel from "../../components/FilterPanel";
 
+/**
+ * Pantalla de historial de registros de asistencia.
+ * Muestra todos los eventos de entrada/salida y permite filtrarlos.
+ */
 export default function RegistrosPage() {
+  // Almacena los registros de asistencia obtenidos del backend.
   const [records, setRecords] = useState([]);
+
+  // Guarda la lista de estudiantes para convertir IDs en nombres legibles.
   const [students, setStudents] = useState([]);
+
+  // Guarda la lista de usuarios para identificar quién registró la asistencia.
   const [users, setUsers] = useState([]);
+
+  // Estado para mostrar la carga inicial.
   const [initialLoading, setInitialLoading] = useState(true);
 
+  // Hooks API reutilizables.
   const { call: loadRecords, loading: loadingRecords } = useApiCall();
   const { call: loadStudents } = useApiCall();
   const { call: loadUsers } = useApiCall();
 
+  // Filtros para buscar registros por estudiante o estado.
   const { filtered, setSearchTerm, filters, setFilters } = useFilters(
     records,
     (item, filterObj) => {
@@ -27,6 +40,7 @@ export default function RegistrosPage() {
     loadInitialData();
   }, []);
 
+  // Carga registros, estudiantes y usuarios necesarios para la vista.
   async function loadInitialData() {
     try {
       setInitialLoading(true);
@@ -34,11 +48,10 @@ export default function RegistrosPage() {
         loadRecords("/registros", { method: "GET" }),
         loadStudents("/estudiantes", { method: "GET" }),
         loadUsers("/usuarios", { method: "GET" }),
-      ]);  
+      ]);
       setRecords(recordsData?.data || recordsData?.data?.registros || []);
       setStudents(studentsData?.data?.estudiantes || studentsData?.data || []);
       setUsers(usersData?.data || []);
-
     } catch (error) {
       console.error("Error cargando datos:", error);
     } finally {
@@ -46,16 +59,19 @@ export default function RegistrosPage() {
     }
   }
 
+  // Convierte el id del estudiante en un nombre legible.
   const getStudentName = (id) => {
     const student = students.find((s) => s.id_estudiante === id);
     return student ? `${student.nombre} ${student.apellido1}` : "Desconocido";
   };
 
+  // Convierte el id del usuario que registró la asistencia en un nombre legible.
   const getUserName = (id) => {
     const user = users.find((u) => u.id_usuario === id);
     return user ? user.nombre : "Desconocido";
   };
 
+  // Define cómo se mostrarán las columnas de la tabla principal.
   const columns = [
     {
       key: "fecha",
@@ -79,7 +95,7 @@ export default function RegistrosPage() {
       render: (value) => {
         const config = {
           "a tiempo": { bg: "bg-green-100", text: "text-green-700", label: "A tiempo" },
-          "tarde":    { bg: "bg-yellow-100", text: "text-yellow-700", label: "Tarde" },
+          "tarde": { bg: "bg-yellow-100", text: "text-yellow-700", label: "Tarde" },
         };
         const style = config[value] ?? { bg: "bg-gray-100", text: "text-gray-600", label: value };
         return (
@@ -108,8 +124,8 @@ export default function RegistrosPage() {
             label: "Estudiante",
             type: "select",
             options: students.map((s) => ({
-              label: `${s.nombre} ${s.apellido1}`,  // ✅ apellido1
-              value: s.id_estudiante,               // ✅ id_estudiante
+              label: `${s.nombre} ${s.apellido1}`,
+              value: s.id_estudiante,
             })),
           },
           {

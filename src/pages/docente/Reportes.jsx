@@ -1,29 +1,37 @@
 import { useState, useEffect } from "react";
 import { useApiCall } from "../../hooks/useApiCall";
 
+/**
+ * Página de reportes del docente.
+ * Permite consultar asistencia por grado, por estudiante y actividad general.
+ */
 export default function DocenteReportes() {
+  // Tab activa entre los distintos tipos de reportes.
   const [activeTab, setActiveTab] = useState("grado");
+
+  // Listas maestras para completar selectores.
   const [grados, setGrados] = useState([]);
   const [estudiantes, setEstudiantes] = useState([]);
 
-  // Reporte por grado
+  // Reporte por grado: filtros y resultados.
   const [gradoId, setGradoId] = useState("");
   const [fechaGrado, setFechaGrado] = useState("");
   const [reporteGrado, setReporteGrado] = useState(null);
-  const [estudiantesGrado, setEstudiantesGrado] = useState([]); // ✅ nuevo
-  const [registrosFecha, setRegistrosFecha] = useState([]);     // ✅ nuevo
+  const [estudiantesGrado, setEstudiantesGrado] = useState([]);
+  const [registrosFecha, setRegistrosFecha] = useState([]);
 
-  // Reporte por estudiante
+  // Reporte por estudiante: filtros y resultados.
   const [estudianteId, setEstudianteId] = useState("");
   const [fechaInicioEst, setFechaInicioEst] = useState("");
   const [fechaFinEst, setFechaFinEst] = useState("");
   const [reporteEstudiante, setReporteEstudiante] = useState(null);
 
-  // Reporte actividad
+  // Reporte general de actividad: rango de fechas y resumen.
   const [fechaInicioAct, setFechaInicioAct] = useState("");
   const [fechaFinAct, setFechaFinAct] = useState("");
   const [reporteActividad, setReporteActividad] = useState(null);
 
+  // Servicios API para consultar grados, estudiantes y reportes.
   const { call: fetchGrados } = useApiCall();
   const { call: fetchEstudiantes } = useApiCall();
   const { call: fetchGrado, loading: loadingGrado } = useApiCall();

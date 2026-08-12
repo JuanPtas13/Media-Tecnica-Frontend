@@ -2,15 +2,33 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useApiCall } from "../../hooks/useApiCall";
 
+/**
+ * Pantalla para registrar la llegada de un estudiante al colegio.
+ * El vigilante escanea o escribe el documento y el sistema determina si llegó a tiempo o tarde.
+ */
 export default function RegistrarIngreso() {
+  // Usuario autenticado que realiza el registro.
   const { user } = useAuth();
+
+  // Documento del estudiante que se va a registrar.
   const [documento, setDocumento] = useState("");
+
+  // Configuración horaria vigente que define el límite y la tolerancia.
   const [config, setConfig] = useState(null);
+
+  // Resultado del registro para mostrar mensaje visual final.
   const [resultado, setResultado] = useState(null);
+
+  // Error por si el estudiante no existe o hay algún problema.
   const [error, setError] = useState(null);
+
+  // Indica si el sistema está procesando el ingreso.
   const [procesando, setProcesando] = useState(false);
+
+  // Referencia para mantener el foco en el input cada vez que se limpia la pantalla.
   const inputRef = useRef(null);
 
+  // Endpoints reutilizables para buscar estudiante, cargar config y crear registros.
   const { call: buscarEstudiante } = useApiCall();
   const { call: obtenerConfig } = useApiCall();
   const { call: crearRegistro } = useApiCall();
@@ -20,7 +38,7 @@ export default function RegistrarIngreso() {
     inputRef.current?.focus();
   }, []);
 
-  // ✅ Mantener foco siempre en el input
+  // Mantiene el foco en el campo para facilitar el escaneo contínuo.
   useEffect(() => {
     const interval = setInterval(() => {
       inputRef.current?.focus();
@@ -28,6 +46,7 @@ export default function RegistrarIngreso() {
     return () => clearInterval(interval);
   }, []);
 
+  // Carga la configuración horaria vigente del día o periodo activo.
   async function cargarConfig() {
     try {
       const data = await obtenerConfig("/config-horarios/vigente", { method: "GET" });
@@ -37,6 +56,7 @@ export default function RegistrarIngreso() {
     }
   }
 
+  // Decide si el ingreso fue a tiempo o tarde según la hora límite.
   function calcularEstado(config) {
     const ahora = new Date();
     const [h, m] = config.hora_limite_ingreso.split(":").map(Number);
@@ -45,6 +65,7 @@ export default function RegistrarIngreso() {
     return ahoraMinutos <= limiteMinutos ? "a tiempo" : "tarde";
   }
 
+  // Calcula los minutos de retraso respecto al inicio de clase.
   function calcularMinRetraso(config) {
     const ahora = new Date();
     const [h, m] = config.hora_inicio_clase.split(":").map(Number);
@@ -53,7 +74,7 @@ export default function RegistrarIngreso() {
     return Math.max(0, ahoraMinutos - inicioMinutos);
   }
 
-  // ✅ Todo automático al hacer submit
+  // Procesa el documento escaneado y registra la asistencia automáticamente.
   async function handleScan(e) {
     e.preventDefault();
     if (!documento.trim() || procesando) return;

@@ -3,6 +3,10 @@ import { useAuth } from "../../context/AuthContext";
 import { useApiCall } from "../../hooks/useApiCall";
 import StatCard from "../../components/StatCard";
 
+/**
+ * Dashboard principal del docente.
+ * Muestra estadísticas generales de asistencia y acceso rápido a reportes y registros.
+ */
 export default function DocenteDashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState({ total: 0, aTiempo: 0, tarde: 0, ausente: 0 });

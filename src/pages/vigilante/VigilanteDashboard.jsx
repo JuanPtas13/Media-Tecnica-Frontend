@@ -1,7 +1,12 @@
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 
+/**
+ * Dashboard principal del vigilante.
+ * Sirve como acceso rápido a la función más importante: registrar ingreso del estudiante.
+ */
 export default function VigilanteDashboard() {
+  // Obtiene los datos del usuario autenticado para mostrar el saludo.
   const { user } = useAuth();
 
   return (

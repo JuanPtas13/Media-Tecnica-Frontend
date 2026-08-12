@@ -7,18 +7,31 @@ import FormModal from "../../components/FormModal";
 import ConfirmModal from "../../components/ConfirmModal";
 import FilterPanel from "../../components/FilterPanel";
 
+/**
+ * Página para administrar los grados o cursos del colegio.
+ * Permite crear, listar, editar y eliminar grados y grupos.
+ */
 export default function GradosPage() {
+  // Lista de grados obtenida del backend.
   const [grades, setGrades] = useState([]);
+
+  // Control de modales de creación/edición y eliminación.
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // Guarda el grado que se está editando o eliminando.
   const [editingGrade, setEditingGrade] = useState(null);
   const [gradeToDelete, setGradeToDelete] = useState(null);
+
+  // Estado para controlar la carga inicial.
   const [initialLoading, setInitialLoading] = useState(true);
 
+  // Acciones API reutilizables.
   const { call: loadGrades, loading: loadingGrades } = useApiCall();
   const { call: saveGrade, loading: savingGrade } = useApiCall();
   const { call: deleteGrade, loading: deletingGrade } = useApiCall();
 
+  // Filtro por estado para buscar grados activos/inactivos.
   const { filtered, setSearchTerm, filters, setFilters } = useFilters(
     grades,
     (item, filterObj) => {
@@ -29,6 +42,7 @@ export default function GradosPage() {
     }
   );
 
+  // Formulario para registrar un nuevo grado o editar uno existente.
   const form = useForm(
     {
       numero_grado: "",
@@ -42,6 +56,7 @@ export default function GradosPage() {
     loadInitialData();
   }, []);
 
+  // Trae todos los grados del backend al abrir la pantalla.
   async function loadInitialData() {
     try {
       setInitialLoading(true);
@@ -54,6 +69,7 @@ export default function GradosPage() {
     }
   }
 
+  // Crea o actualiza un grado según el estado de edición.
   async function handleSubmit(values) {
     try {
       if (editingGrade) {
@@ -76,17 +92,20 @@ export default function GradosPage() {
     }
   }
 
+  // Completa el formulario con los datos del grado a editar.
   function handleEditClick(grade) {
     setEditingGrade(grade);
     form.setValues(grade);
     setShowModal(true);
   }
 
+  // Pregunta antes de eliminar un grado.
   function handleDeleteClick(grade) {
     setGradeToDelete(grade);
     setShowDeleteModal(true);
   }
 
+  // Elimina el grado seleccionado y vuelve a cargar la lista.
   async function handleConfirmDelete() {
     try {
       await deleteGrade("/grados/" + gradeToDelete.id_grado, {
@@ -100,12 +119,14 @@ export default function GradosPage() {
     }
   }
 
+  // Abre el modal para registrar un nuevo grado.
   function handleOpenModal() {
     setEditingGrade(null);
     form.reset();
     setShowModal(true);
   }
 
+  // Configuración de columnas para la tabla de grados.
   const columns = [
     { key: "numero_grado", label: "Grado" },
     { key: "grupo", label: "Grupo" },

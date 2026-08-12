@@ -4,12 +4,21 @@ import { useFilters } from "../../hooks/useFilters";
 import AdminTable from "../../components/AdminTable";
 import FilterPanel from "../../components/FilterPanel";
 
+/**
+ * Vista de registros del docente.
+ * Muestra el historial de asistencia del grupo y permite filtrarlo por estado.
+ */
 export default function DocenteRegistros() {
+  // Guarda la lista de registros de asistencia.
   const [records, setRecords] = useState([]);
+
+  // Controla la carga inicial de la vista.
   const [initialLoading, setInitialLoading] = useState(true);
 
+  // Hook que ejecuta la petición para obtener registros.
   const { call: loadRecords, loading: loadingRecords } = useApiCall();
 
+  // Filtra los registros por estado para que el docente pueda hacer búsquedas rápidas.
   const { filtered, setSearchTerm, filters, setFilters } = useFilters(
     records,
     (item, filterObj) => {
@@ -22,6 +31,7 @@ export default function DocenteRegistros() {
     loadInitialData();
   }, []);
 
+  // Obtiene el historial de asistencia desde el backend.
   async function loadInitialData() {
     try {
       setInitialLoading(true);
@@ -34,6 +44,7 @@ export default function DocenteRegistros() {
     }
   }
 
+  // Define cómo se muestran las columnas y valores del historial.
   const columns = [
     {
       key: "fecha",
@@ -52,8 +63,8 @@ export default function DocenteRegistros() {
       render: (value) => {
         const config = {
           "a tiempo": { bg: "bg-green-100", text: "text-green-700", label: "A tiempo" },
-          "tarde":    { bg: "bg-yellow-100", text: "text-yellow-700", label: "Tarde" },
-          "ausente":  { bg: "bg-red-100", text: "text-red-700", label: "Ausente" },
+          "tarde": { bg: "bg-yellow-100", text: "text-yellow-700", label: "Tarde" },
+          "ausente": { bg: "bg-red-100", text: "text-red-700", label: "Ausente" },
         };
         const style = config[value] ?? { bg: "bg-gray-100", text: "text-gray-600", label: value };
         return (

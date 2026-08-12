@@ -7,20 +7,39 @@ import FormModal from "../../components/FormModal";
 import ConfirmModal from "../../components/ConfirmModal";
 import FilterPanel from "../../components/FilterPanel";
 
+/**
+ * Página para administrar estudiantes del sistema escolar.
+ * Permite ver, filtrar, crear, editar y eliminar estudiantes.
+ */
 export default function EstudiantesPage() {
+  // Lista de estudiantes obtenida desde el backend.
   const [students, setStudents] = useState([]);
+
+  // Lista de grados disponibles para asociar al estudiante.
   const [grades, setGrades] = useState([]);
+
+  // Controla la visibilidad del modal de creación/edición.
   const [showModal, setShowModal] = useState(false);
+
+  // Controla la visibilidad del modal de confirmación para eliminar.
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // Guarda el estudiante que se está editando en el momento.
   const [editingStudent, setEditingStudent] = useState(null);
+
+  // Guarda el estudiante que se va a eliminar.
   const [studentToDelete, setStudentToDelete] = useState(null);
+
+  // Estado usado para mostrar carga inicial de datos.
   const [initialLoading, setInitialLoading] = useState(true);
 
+  // Hooks personalizados para consumir la API con indicadores de carga.
   const { call: loadStudents, loading: loadingStudents } = useApiCall();
   const { call: loadGrades } = useApiCall();
   const { call: saveStudent, loading: savingStudent } = useApiCall();
   const { call: deleteStudent, loading: deletingStudent } = useApiCall();
 
+  // Filtra los estudiantes por grado y estado usando el hook de filtros.
   const { filtered, setSearchTerm, filters, setFilters } = useFilters(
     students,
     (item, filterObj) => {
@@ -32,6 +51,7 @@ export default function EstudiantesPage() {
     }
   );
 
+  // Formulario para crear y editar estudiantes.
   const form = useForm(
     {
       nombre: "",
@@ -48,6 +68,7 @@ export default function EstudiantesPage() {
     loadInitialData();
   }, []);
 
+  // Carga la lista de estudiantes y grados al entrar a la página.
   async function loadInitialData() {
     try {
       setInitialLoading(true);
@@ -64,6 +85,7 @@ export default function EstudiantesPage() {
     }
   }
 
+  // Guarda un estudiante nuevo o actualiza uno existente.
   async function handleSubmit(values) {
     try {
       if (editingStudent) {
@@ -86,6 +108,7 @@ export default function EstudiantesPage() {
     }
   }
 
+  // Abre el modal con los datos del estudiante para edición.
   function handleEditClick(student) {
     setEditingStudent(student);
     form.setValues({
@@ -99,11 +122,13 @@ export default function EstudiantesPage() {
     setShowModal(true);
   }
 
+  // Prepara el estudiante que será eliminado.
   function handleDeleteClick(student) {
     setStudentToDelete(student);
     setShowDeleteModal(true);
   }
 
+  // Elimina al estudiante seleccionado y recarga la tabla.
   async function handleConfirmDelete() {
     try {
       await deleteStudent(`/estudiantes/${studentToDelete.id_estudiante}`, {
@@ -117,12 +142,14 @@ export default function EstudiantesPage() {
     }
   }
 
+  // Abre el modal para crear un estudiante nuevo.
   function handleOpenModal() {
     setEditingStudent(null);
     form.reset();
     setShowModal(true);
   }
 
+  // Define la estructura visual de las columnas de la tabla.
   const columns = [
     { key: "nombre", label: "Nombre" },
     { key: "apellido1", label: "Primer Apellido" },
@@ -258,6 +285,7 @@ export default function EstudiantesPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Seleccionar grado</option>
+
               {grades.map((g) => (
                 <option key={g.id_grado} value={g.id_grado}>
                   {g.numero_grado} - {g.grupo}

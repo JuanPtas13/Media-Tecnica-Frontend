@@ -7,26 +7,35 @@ import { registrosService } from "../services/registrosService";
 import { gradosService } from "../services/gradosService";
 
 /**
- * Dashboard principal del panel de administración
- * Muestra estadísticas generales del sistema
+ * Dashboard principal del panel administrativo.
+ * Sirve como resumen general del estado del sistema escolar.
  */
 export default function AdminDashboard() {
+  // Obtiene la información del usuario logueado para mostrar el saludo.
   const { user } = useAuth();
+
+  // Guarda las cantidades totales de cada entidad para mostrar estadísticas rápidas.
   const [stats, setStats] = useState({
     estudiantes: 0,
     usuarios: 0,
     registros: 0,
     grados: 0,
   });
+
+  // Indica si la carga de datos aún está en proceso.
   const [loading, setLoading] = useState(true);
+
+  // Guarda el error si alguna consulta falla.
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Carga las estadísticas cuando se abre el dashboard por primera vez.
     const loadStats = async () => {
       try {
         setLoading(true);
         setError(null);
 
+        // Ejecuta las cuatro consultas en paralelo para ganar velocidad.
         const [
           estudiantesData,
           usuariosData,
@@ -39,6 +48,7 @@ export default function AdminDashboard() {
           gradosService.getAll(),
         ]);
 
+        // Actualiza el estado con las cantidades reales obtenidas del backend.
         setStats({
           estudiantes: estudiantesData?.data?.estudiantes?.length || 0,
           usuarios: usuariosData?.data?.length || 0,
@@ -58,7 +68,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      {/* Encabezado del dashboard con saludo personalizado. */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           ¡Bienvenido, {user?.nombre}!
@@ -68,14 +78,14 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      {/* Error Message */}
+      {/* Muestra un mensaje si la carga de datos falló. */}
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
           {error}
         </div>
       )}
 
-      {/* Stats Grid */}
+      {/* Grid con las tarjetas de estadísticas del sistema. */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           icon="👥"
@@ -103,7 +113,7 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Quick Links */}
+      {/* Bloque con enlaces rápidos a las pantallas más usadas del administrador. */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-4">
           Accesos Rápidos
