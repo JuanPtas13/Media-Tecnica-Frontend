@@ -43,7 +43,9 @@ export const apiCall = async (endpoint, options = {}) => {
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.detail || "Error en la solicitud");
+    const requestError = new Error(error.detail || "Error en la solicitud");
+    requestError.status = response.status;
+    throw requestError;
   }
 
   return await response.json();

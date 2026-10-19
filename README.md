@@ -5,19 +5,19 @@ Aplicación React con Vite, Tailwind CSS y autenticación JWT.
 ## 🚀 Instalación
 
 ### Requisitos
-- Node.js >= 16
-- npm o yarn
+- Node.js >= 18
+- npm
 
 ### Pasos
 
 1. **Navegar al directorio del frontend:**
 ```bash
-cd Front
+cd Media-Tecnica-Frontend
 ```
 
 2. **Instalar dependencias:**
 ```bash
-npm install
+npm ci
 ```
 
 3. **Iniciar el servidor de desarrollo:**
@@ -152,6 +152,13 @@ function MiComponente() {
 - **vite**: Build tool y dev server
 
 ## ⚙️ Configuración
+
+Configura `VITE_API_BASE_URL` con la URL base del backend antes de compilar
+para producción (por ejemplo, `https://api.tu-dominio.com`). Vite incorpora
+esta variable en los archivos del build; no incluyas secretos en variables
+`VITE_*`, porque son visibles en el navegador. El build de producción se
+detiene si falta la URL, usa HTTP o apunta a localhost. El archivo
+`.env.example` contiene la configuración local de desarrollo.
 
 ### Vite (`vite.config.js`)
 - Puerto: `5173`
