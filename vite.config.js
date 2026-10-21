@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// Configura Vite y exige HTTPS para la URL del backend en builds de producción.
 export default defineConfig(({ mode }) => {
   if (mode !== 'development') {
     const { VITE_API_BASE_URL } = loadEnv(mode, process.cwd(), 'VITE_')

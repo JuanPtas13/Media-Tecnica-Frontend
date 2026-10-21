@@ -12,6 +12,7 @@ export function useForm(initialValues = {}, onSubmit = null) {
   const [touched, setTouched] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Actualiza el campo indicado por name y conserva el tipo booleano de checkboxes.
   const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
     setValues((prev) => ({
@@ -20,6 +21,7 @@ export function useForm(initialValues = {}, onSubmit = null) {
     }));
   }, []);
 
+  // Marca un campo como visitado para mostrar validaciones al salir de él.
   const handleBlur = useCallback((e) => {
     const { name } = e.target;
     setTouched((prev) => ({
@@ -28,6 +30,7 @@ export function useForm(initialValues = {}, onSubmit = null) {
     }));
   }, []);
 
+  // Previene la recarga de página y llama al envío mientras controla el indicador.
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -43,6 +46,7 @@ export function useForm(initialValues = {}, onSubmit = null) {
     [values, onSubmit]
   );
 
+  // Restaura valores iniciales y borra errores y marcas de interacción.
   const reset = useCallback(() => {
     setValues(initialValues);
     setErrors({});

@@ -1,5 +1,7 @@
+// Centraliza la URL del backend; VITE_API_BASE_URL se define en el .env del frontend.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
+// Envía las credenciales al endpoint público y convierte errores HTTP en mensajes útiles.
 export const loginUser = async (email, contraseña) => {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -27,6 +29,7 @@ export const loginUser = async (email, contraseña) => {
   }
 };
 
+// Añade el JWT almacenado a las solicitudes protegidas de la API.
 export const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   return {
@@ -35,6 +38,7 @@ export const getAuthHeaders = () => {
   };
 };
 
+// Ejecuta solicitudes autenticadas y propaga el detalle HTTP para que la pantalla lo maneje.
 export const apiCall = async (endpoint, options = {}) => {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     headers: getAuthHeaders(),

@@ -133,7 +133,8 @@ export default function AdminTable({
                 ))}
                 {(onEdit || onDelete || extraActions.length > 0) && (
                   <td className="px-6 py-4 text-sm">
-                    <div className="flex gap-2">
+                  {/* Editar usa azul, eliminar rojo y acciones adicionales amarillo; ajusta estas clases para cambiar sus colores. */}
+                  <div className="flex gap-2">
                       {onEdit && (
                         <button
                           onClick={() => onEdit(row)}

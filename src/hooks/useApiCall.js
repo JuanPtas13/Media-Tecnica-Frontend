@@ -11,6 +11,7 @@ export function useApiCall(initialEndpoint = null) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Ejecuta una petición y mantiene sincronizados los estados de carga, datos y error.
   const call = useCallback(
     async (endpoint, options = {}) => {
       setLoading(true);
@@ -30,6 +31,7 @@ export function useApiCall(initialEndpoint = null) {
     []
   );
 
+  // Limpia los estados para preparar una nueva consulta o abandonar la pantalla.
   const reset = useCallback(() => {
     setData(null);
     setError(null);

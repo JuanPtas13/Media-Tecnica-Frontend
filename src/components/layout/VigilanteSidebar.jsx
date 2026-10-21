@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+// Presenta las opciones habilitadas para vigilante y los datos de la sesión.
 export default function VigilanteSidebar({ isOpen, onToggle }) {
   const location = useLocation();
   const { logout, user } = useAuth();
 
+  // Comprueba qué enlace coincide con la dirección actual para aplicar su estilo activo.
   const isActive = (path) => location.pathname.startsWith(`/vigilante${path}`);
 
   const menuItems = [
@@ -59,6 +61,7 @@ export default function VigilanteSidebar({ isOpen, onToggle }) {
               <p className="text-xs text-gray-500 truncate">{user.email}</p>
             </div>
           )}
+          {/* Cambia bg-red-50/text-red-600 para el color normal y hover:bg-red-100 para el hover. */}
           <button
             onClick={logout}
             className="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-200 font-medium text-sm"

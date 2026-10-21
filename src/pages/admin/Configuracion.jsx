@@ -33,6 +33,7 @@ export default function ConfiguracionPage() {
     loadInitialData();
   }, []);
 
+  // Lee el horario vigente; 404 significa que aún no se ha creado uno.
   async function loadInitialData() {
     try {
       setInitialLoading(true);
@@ -52,6 +53,7 @@ export default function ConfiguracionPage() {
     }
   }
 
+  // Valida el orden de las horas y luego crea o actualiza la configuración horaria.
   async function handleSubmit(values) {
     setFormError("");
     const inicioMinutos = toMinutes(values.hora_inicio_clase);
@@ -90,16 +92,19 @@ export default function ConfiguracionPage() {
     }
   }
 
+  // Convierte HH:mm en minutos desde medianoche para comparar horas sin ambigüedad.
   function toMinutes(value) {
     const [hours, minutes] = value.split(":").map(Number);
     return hours * 60 + minutes;
   }
 
+  // Calcula la tolerancia visible como diferencia entre inicio y límite de ingreso.
   function getTolerance(start, limit) {
     if (!start || !limit) return 0;
     return Math.max(0, toMinutes(limit) - toMinutes(start));
   }
 
+  // Copia los valores guardados al formulario antes de abrir el modo de edición.
   function handleEditClick() {
     form.setValues({
       hora_inicio_clase: config.hora_inicio_clase?.slice(0, 5),
@@ -113,12 +118,14 @@ export default function ConfiguracionPage() {
     setShowModal(true);
   }
 
+  // Limpia el formulario y abre el modal para registrar un horario nuevo.
   function handleCrearClick() {
     form.reset();
     setFormError("");
     setShowModal(true);
   }
 
+  // Presenta fechas del backend en formato local o indica que no tienen fecha final.
   const formatDate = (dateString) => {
     if (!dateString) return "Indefinido";
     return new Date(dateString + "T00:00:00").toLocaleDateString("es-ES");
@@ -128,6 +135,7 @@ export default function ConfiguracionPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Configuración Horaria</h1>
+        {/* Cambia from-blue-500/to-indigo-600 para el color del botón y hover:shadow-lg para su hover. */}
         {!config && !initialLoading && !loadError && (
           <button
             onClick={handleCrearClick}

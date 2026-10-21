@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useApiCall } from "../../hooks/useApiCall";
 import StatCard from "../../components/StatCard";
 
+// Devuelve la fecha local en formato YYYY-MM-DD, requerido por los endpoints.
 function getLocalDate() {
   const today = new Date();
   const month = String(today.getMonth() + 1).padStart(2, "0");
@@ -11,6 +12,7 @@ function getLocalDate() {
   return `${today.getFullYear()}-${month}-${day}`;
 }
 
+// Presenta al docente un resumen diario de asistencia de todos los grados.
 export default function DocenteDashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState({ total: 0, aTiempo: 0, tarde: 0, ausente: 0 });
@@ -22,6 +24,7 @@ export default function DocenteDashboard() {
   const { call: loadReporteGrado } = useApiCall();
 
   useEffect(() => {
+    // Combina registros del día con los reportes por grado para contar ausencias.
     async function loadStats() {
       try {
         setLoading(true);

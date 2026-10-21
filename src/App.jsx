@@ -20,6 +20,7 @@ import VigilantePanel from "./pages/vigilante/VigilantePanel";
 import VigilanteDashboard from "./pages/vigilante/VigilanteDashboard";
 import RegistrarIngreso from "./pages/vigilante/RegistrarIngreso";
 
+// Define el enrutamiento y envuelve toda la interfaz con autenticación y avisos.
 function App() {
   return (
     <AuthProvider>

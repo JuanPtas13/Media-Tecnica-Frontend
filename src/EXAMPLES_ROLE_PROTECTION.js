@@ -3,6 +3,8 @@
  * 
  * Este archivo muestra ejemplos concretos de cómo usar
  * el sistema de protección de rutas por rol.
+ * Son fragmentos didácticos: antes de usarlos, adáptalos a los hooks y rutas
+ * reales de la aplicación (no son componentes conectados a la API de producción).
  */
 
 // ============================================================
@@ -12,10 +14,12 @@
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+// Ejemplifica una barra que muestra acciones distintas según autenticación y rol.
 function NavbarExample() {
   const { user, userRole, isAuthenticated, logout, hasRole } = useAuth();
   const navigate = useNavigate();
 
+  // Cierra la sesión en el contexto y vuelve a la página de inicio de sesión.
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -107,6 +111,7 @@ function NavbarExample() {
 // 3. COMPONENTE CON LÓGICA CONDICIONAL POR ROL
 // ============================================================
 
+// Muestra cómo elegir contenido de ejemplo según el rol del usuario.
 function DashboardExample() {
   const { userRole, user } = useAuth();
 
@@ -164,6 +169,7 @@ import {
   getTokenTimeRemaining 
 } from '../utils/jwt';
 
+// Enseña cómo leer localmente el payload y la expiración de un JWT.
 function JWTUtilitiesExample() {
   const token = localStorage.getItem('token');
 
@@ -206,6 +212,7 @@ function JWTUtilitiesExample() {
 
 import { useState } from 'react';
 
+// Ejemplifica campos controlados y limita el cambio de rol al administrador.
 function UserFormExample() {
   const [formData, setFormData] = useState({ nombre: '', rol: 'docente' });
   const { hasRole } = useAuth();
@@ -213,11 +220,13 @@ function UserFormExample() {
   // Solo admin puede cambiar el rol
   const canChangeRole = hasRole('admin');
 
+  // Actualiza únicamente el campo cuyo name corresponde al input modificado.
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Previene el envío HTML convencional; aquí se conectaría la petición de ejemplo.
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Enviar al servidor...
@@ -275,6 +284,7 @@ function UserFormExample() {
 
 import { useAuth } from '../context/AuthContext';
 
+// Ilustra el flujo de reemplazar un JWT; el endpoint depende del backend real.
 async function refreshTokenExample() {
   const { setAuthToken, logout } = useAuth();
 
@@ -311,6 +321,7 @@ async function refreshTokenExample() {
 
 import { useAuth } from '../context/AuthContext';
 
+// Ejemplo conceptual de solicitud autenticada; la app real usa src/services/api.js.
 export async function apiCall(endpoint, options = {}) {
   const { token, logout } = useAuth();
 
@@ -357,6 +368,7 @@ export async function apiCall(endpoint, options = {}) {
 // 8. COMPONENTE DE PROTECCIÓN CONDICIONAL
 // ============================================================
 
+// Muestra contenido o enlaces según autenticación y el rol que tenga la sesión.
 function ConditionalRenderExample() {
   const { hasRole, isAuthenticated } = useAuth();
 
@@ -409,6 +421,7 @@ function ConditionalRenderExample() {
 // 9. VERIFICACIÓN DE PERMISOS AVANZADA
 // ============================================================
 
+// Ejemplifica controles visuales para permisos específicos dentro de una pantalla.
 function AdvancedPermissionsExample() {
   const { userRole, user } = useAuth();
 
@@ -420,6 +433,7 @@ function AdvancedPermissionsExample() {
   };
 
   // Función para verificar permisos
+  // Comprueba si el permiso solicitado aparece en la lista del usuario de ejemplo.
   const hasPermission = (permission) => {
     const rolePermissions = permissions[userRole] || [];
     return rolePermissions.includes(permission);

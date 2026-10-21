@@ -47,12 +47,14 @@ export default function UnauthorizedPage() {
 
         {/* Botones para volver o cerrar sesión y salir del sistema. */}
         <div className="flex gap-3">
+          {/* Cambia bg-gray-200 y hover:bg-gray-300 para editar el color del botón Atrás. */}
           <button
             onClick={() => navigate(-1)}
             className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition"
           >
             ← Atrás
           </button>
+          {/* Cambia bg-red-500 y hover:bg-red-600 para editar el color de cierre de sesión. */}
           <button
             onClick={handleLogout}
             className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition"

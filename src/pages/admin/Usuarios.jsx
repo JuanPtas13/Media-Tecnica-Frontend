@@ -124,6 +124,7 @@ export default function UsuariosPage() {
     }
   }
 
+  // Valida y envía una nueva contraseña para el usuario seleccionado.
   async function handleChangePassword() {
     setPasswordError("");
     if (!newPassword) {
@@ -144,6 +145,7 @@ export default function UsuariosPage() {
     }
   }
 
+  // Abre el formulario con los datos existentes, sin reutilizar su contraseña.
   function handleEditClick(user) {
     setFormError("");
     setEditingUser(user);
@@ -151,12 +153,14 @@ export default function UsuariosPage() {
     setShowModal(true);
   }
 
+  // Selecciona el usuario y solicita confirmación antes de eliminarlo.
   function handleDeleteClick(user) {
     setDeleteError("");
     setUserToDelete(user);
     setShowDeleteModal(true);
   }
 
+  // Selecciona al usuario y abre el formulario de cambio de contraseña.
   function handleChangePasswordClick(user) {
     setPasswordError("");
     setUserToChangePassword(user);
@@ -164,6 +168,7 @@ export default function UsuariosPage() {
     setShowPasswordModal(true);
   }
 
+  // Elimina el usuario confirmado y refresca la lista para reflejar el cambio.
   async function handleConfirmDelete() {
     setDeleteError("");
     try {
@@ -179,6 +184,7 @@ export default function UsuariosPage() {
     }
   }
 
+  // Prepara el formulario vacío para crear un usuario nuevo.
   function handleOpenModal() {
     setEditingUser(null);
     setFormError("");

@@ -5,6 +5,7 @@ import { showToast } from "../utils/toast";
  * Hook para manejar errores de API con notificaciones
  */
 export function useErrorHandler() {
+  // Convierte distintos formatos de error en un mensaje y muestra una notificación.
   const handleError = useCallback((error, fallbackMessage = "Error desconocido") => {
     console.error("Error capturado:", error);
 
@@ -25,6 +26,7 @@ export function useErrorHandler() {
     return message;
   }, []);
 
+  // Traduce códigos HTTP frecuentes a mensajes comprensibles para el usuario.
   const handleApiError = useCallback((error, operation = "Operación") => {
     console.error("Error API:", error);
 
@@ -50,10 +52,12 @@ export function useErrorHandler() {
     return message;
   }, []);
 
+  // Muestra una notificación de éxito con el mensaje recibido.
   const handleSuccess = useCallback((message = "Operación completada") => {
     showToast(message, "success");
   }, []);
 
+  // Muestra una notificación informativa de advertencia.
   const handleWarning = useCallback((message = "Advertencia") => {
     showToast(message, "warning");
   }, []);

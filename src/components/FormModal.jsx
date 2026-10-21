@@ -14,6 +14,7 @@ export default function FormModal({
 }) {
   if (!isOpen) return null;
 
+  // Cambia estas clases Tailwind para editar el color del botón Guardar por variante.
   const variantStyles = {
     primary: "bg-blue-600 hover:bg-blue-700",
     success: "bg-green-600 hover:bg-green-700",

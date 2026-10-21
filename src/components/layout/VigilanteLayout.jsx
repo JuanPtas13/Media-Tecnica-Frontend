@@ -2,6 +2,7 @@ import { useState } from "react";
 import VigilanteSidebar from "./VigilanteSidebar";
 import AdminNavbar from "./AdminNavbar";
 
+// Mantiene el mismo marco de navegación en las páginas del rol vigilante.
 export default function VigilanteLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 

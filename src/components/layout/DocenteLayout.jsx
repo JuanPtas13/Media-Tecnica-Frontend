@@ -2,6 +2,7 @@ import { useState } from "react";
 import DocenteSidebar from "./DocenteSidebar";
 import AdminNavbar from "./AdminNavbar";
 
+// Organiza la barra lateral, la barra superior y el contenido de cada vista docente.
 export default function DocenteLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 

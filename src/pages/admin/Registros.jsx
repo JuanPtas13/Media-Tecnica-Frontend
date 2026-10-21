@@ -51,6 +51,7 @@ export default function RegistrosPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // Recarga registros para la fecha elegida; la bandera evita actualizar tras desmontar.
     async function loadRecordsForFilter() {
       const endpoint = filters.fecha
         ? `/registros/fecha/${filters.fecha}?limit=1000`

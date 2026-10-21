@@ -4,6 +4,7 @@ import { useFilters } from "../../hooks/useFilters";
 import AdminTable from "../../components/AdminTable";
 import FilterPanel from "../../components/FilterPanel";
 
+// Convierte la lista técnica de permisos en texto legible para la tabla.
 const formatPermissions = (permissions) => {
   if (permissions === "all") return "Todos los permisos";
   if (!permissions) return "Sin permisos asignados";
@@ -14,6 +15,7 @@ const formatPermissions = (permissions) => {
     .join(", ");
 };
 
+// Permite consultar y filtrar los roles disponibles sin modificarlos.
 export default function RolesPage() {
   const [roles, setRoles] = useState([]);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -22,6 +24,7 @@ export default function RolesPage() {
   const { filtered, setSearchTerm } = useFilters(roles);
 
   useEffect(() => {
+    // Carga roles al montar la página y valida el formato recibido de la API.
     async function loadInitialData() {
       try {
         setInitialLoading(true);

@@ -6,6 +6,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Paleta compartida opcional: ajusta estos valores si quieres cambiar primary en toda la interfaz.
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',

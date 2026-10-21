@@ -10,10 +10,12 @@ import { useState, useCallback, useRef } from "react";
 let toastQueue = [];
 let listeners = [];
 
+// Difunde el contenido actual de la cola a todos los componentes suscritos.
 function notifyListeners() {
   listeners.forEach((listener) => listener([...toastQueue]));
 }
 
+// Agrega una notificación temporal y devuelve su id para poder identificarla.
 export function showToast(message, type = "info", duration = 3000) {
   const id = Date.now();
   const toast = { id, message, type };
@@ -31,6 +33,7 @@ export function showToast(message, type = "info", duration = 3000) {
   return id;
 }
 
+// Expone la cola y acciones para mostrar o quitar notificaciones desde React.
 export function useToast() {
   const [toasts, setToasts] = useState([...toastQueue]);
   const listenerRef = useRef(null);
@@ -64,6 +67,7 @@ export function useToast() {
 export function ToastContainer() {
   const { toasts, removeToast } = useToast();
 
+  // Cambia estas clases Tailwind para editar colores de éxito, error, aviso e información.
   const getStyles = (type) => {
     const styles = {
       success: "bg-green-500 text-white",
@@ -74,6 +78,7 @@ export function ToastContainer() {
     return styles[type] || styles.info;
   };
 
+  // Elige el símbolo que acompaña cada tipo de notificación.
   const getIcon = (type) => {
     const icons = {
       success: "✓",
@@ -93,6 +98,7 @@ export function ToastContainer() {
         >
           <span className="text-lg font-bold">{getIcon(toast.type)}</span>
           <span className="flex-1">{toast.message}</span>
+          {/* hover:opacity-75 modifica la transparencia al pasar el cursor. */}
           <button
             onClick={() => removeToast(toast.id)}
             className="text-lg hover:opacity-75 transition"

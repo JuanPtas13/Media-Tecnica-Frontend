@@ -28,6 +28,7 @@ export default function RegistrarIngreso() {
 
   // Referencia para mantener el foco en el input cada vez que se limpia la pantalla.
   const inputRef = useRef(null);
+  const [ahora, setAhora] = useState(() => Date.now());
 
   // Endpoints reutilizables para buscar estudiante, cargar config y crear registros.
   const { call: buscarEstudiante } = useApiCall();
@@ -44,6 +45,11 @@ export default function RegistrarIngreso() {
     const interval = setInterval(() => {
       inputRef.current?.focus();
     }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => setAhora(Date.now()), 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -81,6 +87,16 @@ export default function RegistrarIngreso() {
     return Math.max(0, ahoraMinutos - inicioMinutos);
   }
 
+  // Compara la hora local actual con el cierre y bloquea el registro si ya pasó.
+  function asistenciaCerrada(config) {
+    if (!config?.hora_cierre_asistencia) return false;
+    const [h, m] = config.hora_cierre_asistencia.split(":").map(Number);
+    const horaCierreMinutos = h * 60 + m;
+    const horaActual = new Date(ahora);
+    const ahoraMinutos = horaActual.getHours() * 60 + horaActual.getMinutes();
+    return ahoraMinutos >= horaCierreMinutos;
+  }
+
   // Procesa el documento escaneado y registra la asistencia automáticamente.
   async function handleScan(e) {
     e.preventDefault();
@@ -88,6 +104,11 @@ export default function RegistrarIngreso() {
 
     setError(null);
     setResultado(null);
+    if (asistenciaCerrada(config)) {
+      setError(`La asistencia está cerrada desde las ${config.hora_cierre_asistencia.slice(0, 5)}. El estudiante queda como ausente.`);
+      setDocumento("");
+      return;
+    }
     setProcesando(true);
 
     try {
@@ -152,7 +173,11 @@ export default function RegistrarIngreso() {
       }, 3000);
 
     } catch (err) {
-      setError("Error al procesar el ingreso. Intenta de nuevo.");
+      setError(
+        err.status === 409
+          ? err.message
+          : "Error al procesar el ingreso. Intenta de nuevo."
+      );
       setDocumento("");
     } finally {
       setProcesando(false);
@@ -182,6 +207,12 @@ export default function RegistrarIngreso() {
         </div>
       )}
 
+      {config && asistenciaCerrada(config) && (
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          La asistencia está cerrada desde las {config.hora_cierre_asistencia?.slice(0, 5)}. Los estudiantes sin registro aparecen como ausentes.
+        </div>
+      )}
+
       {configLoadError && (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
           {configLoadError}
@@ -206,13 +237,14 @@ export default function RegistrarIngreso() {
             value={documento}
             onChange={(e) => setDocumento(e.target.value)}
             placeholder="Escanea o digita el documento..."
-            disabled={procesando}
+            disabled={procesando || (config && asistenciaCerrada(config))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
           />
 
+          {/* Cambia bg-purple-500 y hover:bg-purple-600 para editar el color del botón de ingreso. */}
           <button
             type="submit"
-            disabled={procesando || !documento.trim() || !config}
+            disabled={procesando || !documento.trim() || !config || asistenciaCerrada(config)}
             className="w-full py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 font-semibold"
           >
             {procesando ? "Procesando..." : "Registrar (Enter)"}

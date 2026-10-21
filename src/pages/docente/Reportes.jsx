@@ -46,6 +46,7 @@ export default function DocenteReportes() {
     loadData();
   }, []);
 
+  // Carga listas maestras para los selectores de grados y estudiantes.
   async function loadData() {
     try {
       const [gradosData, estudiantesData] = await Promise.all([
@@ -60,6 +61,7 @@ export default function DocenteReportes() {
     }
   }
 
+  // Solicita resumen, estudiantes y registros para mostrar la asistencia del grado.
   async function buscarReporteGrado() {
     setReportError("");
     if (!gradoId || !fechaGrado) {
@@ -90,6 +92,7 @@ export default function DocenteReportes() {
     }
   }
 
+  // Valida el rango y solicita el historial de un estudiante seleccionado.
   async function buscarReporteEstudiante() {
     setReportError("");
     if (!estudianteId || !fechaInicioEst || !fechaFinEst) {
@@ -113,6 +116,7 @@ export default function DocenteReportes() {
     }
   }
 
+  // Valida el rango de fechas y solicita el resumen y detalle de actividad.
   async function buscarReporteActividad() {
     setReportError("");
     if (!fechaInicioAct || !fechaFinAct) {
@@ -136,7 +140,8 @@ export default function DocenteReportes() {
     }
   }
 
-  // ✅ Cruzar estudiante con su registro del día
+  // Cruza cada estudiante con su registro; sin registro queda pendiente o ausente
+  // según si la hora de cierre ya confirmó la asistencia.
   function getEstadoEstudiante(estudianteId) {
     const registro = registrosFecha.find(r => r.estudiante_id === estudianteId);
     if (registro) return registro.estado;
@@ -209,6 +214,7 @@ export default function DocenteReportes() {
                 />
               </div>
             </div>
+            {/* Cambia bg-green-500 y hover:bg-green-600 para editar el color de este botón. */}
             <button
               onClick={buscarReporteGrado}
               disabled={loadingGrado || reportLoading}
@@ -453,6 +459,39 @@ export default function DocenteReportes() {
               <p className="text-sm text-gray-500 mt-4 text-center">
                 Periodo: {reporteActividad.fecha_inicio} → {reporteActividad.fecha_fin}
               </p>
+              {reporteActividad.registros?.length > 0 && (
+                <div className="mt-6 overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 bg-gray-50">
+                        <th className="px-4 py-2 text-left font-semibold text-gray-700">Fecha</th>
+                        <th className="px-4 py-2 text-left font-semibold text-gray-700">Hora</th>
+                        <th className="px-4 py-2 text-left font-semibold text-gray-700">Estudiante</th>
+                        <th className="px-4 py-2 text-left font-semibold text-gray-700">Documento</th>
+                        <th className="px-4 py-2 text-left font-semibold text-gray-700">Estado</th>
+                        <th className="px-4 py-2 text-left font-semibold text-gray-700">Min. Retraso</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reporteActividad.registros.map((registro) => (
+                        <tr key={registro.id} className="border-b border-gray-100 hover:bg-gray-50">
+                          <td className="px-4 py-2">{new Date(`${registro.fecha}T00:00:00`).toLocaleDateString("es-ES")}</td>
+                          <td className="px-4 py-2">{registro.hora?.slice(0, 5)}</td>
+                          <td className="px-4 py-2">{registro.estudiante}</td>
+                          <td className="px-4 py-2 text-gray-500">{registro.documento}</td>
+                          <td className="px-4 py-2">{registro.estado}</td>
+                          <td className="px-4 py-2">{registro.min_retraso ?? "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {reporteActividad.registros?.length === 0 && (
+                <p className="mt-6 text-center text-sm text-gray-500">
+                  No hay registros de ingreso en el periodo seleccionado.
+                </p>
+              )}
             </div>
           )}
         </div>

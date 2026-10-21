@@ -14,6 +14,7 @@ export function useLogin() {
   const navigate = useNavigate();
   const { setAuthToken } = useAuth();
 
+  // Autentica al usuario, guarda su token y lo envía al panel que corresponde a su rol.
   const handleLogin = async (email, contraseña) => {
     setError("");
     setLoading(true);

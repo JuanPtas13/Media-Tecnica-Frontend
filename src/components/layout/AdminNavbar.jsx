@@ -7,6 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 export default function AdminNavbar({ onMenuClick }) {
   const { user, userRole } = useAuth();
 
+  // Asigna colores de distintivo por rol; cambia estas clases para editar cada color.
   const getRoleBadgeColor = (role) => {
     const colors = {
       admin: "bg-blue-100 text-blue-800",

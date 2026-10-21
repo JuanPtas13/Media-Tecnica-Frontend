@@ -27,6 +27,7 @@ export function useDebounce(value, delay = 500) {
 export function useDebouncedCallback(callback, delay = 500) {
   const timeoutRef = useRef(null);
 
+  // Reinicia el temporizador en cada llamada y ejecuta solo la última al terminar la espera.
   const debouncedCallback = useCallback(
     (...args) => {
       if (timeoutRef.current) {
@@ -60,12 +61,14 @@ export function useDebouncedSearch(initialValue = "", delay = 500) {
   const [isSearching, setIsSearching] = useState(false);
   const debouncedValue = useDebounce(value, delay);
 
+  // Acepta eventos de input o valores directos y marca que la búsqueda está pendiente.
   const handleChange = useCallback((e) => {
     const newValue = e.target?.value || e;
     setValue(newValue);
     setIsSearching(true);
   }, []);
 
+  // Vacía la búsqueda y restablece su indicador de actividad.
   const reset = useCallback(() => {
     setValue("");
     setIsSearching(false);
@@ -120,6 +123,7 @@ export function useThrottledCallback(callback, delay = 1000) {
   const throttleRef = useRef(null);
   const lastRef = useRef(Date.now());
 
+  // Ejecuta de inmediato si pasó el intervalo; si no, agenda una ejecución final.
   const throttledCallback = useCallback(
     (...args) => {
       const now = Date.now();

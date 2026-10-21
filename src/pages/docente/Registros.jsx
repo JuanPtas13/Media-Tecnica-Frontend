@@ -42,6 +42,7 @@ export default function DocenteRegistros() {
 
   useEffect(() => {
     let cancelled = false;
+    // Carga estudiantes activos para convertir sus identificadores a nombres.
     async function loadInitialData() {
       try {
         const data = await loadStudents("/estudiantes/activos?limit=1000", { method: "GET" });
@@ -67,6 +68,7 @@ export default function DocenteRegistros() {
 
   useEffect(() => {
     let cancelled = false;
+    // Consulta el historial completo o filtrado por fecha, según la selección.
     async function loadRecordsForDate() {
       const endpoint = selectedDate
         ? `/registros/fecha/${selectedDate}?limit=1000`

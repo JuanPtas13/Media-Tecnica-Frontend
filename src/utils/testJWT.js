@@ -5,6 +5,7 @@
  * después de hacer login para ver qué contiene tu token JWT.
  */
 
+// Lee el token de la sesión actual y muestra sus campos para depurar roles y expiración.
 function testJWT() {
   // Obtener el token del localStorage
   const token = localStorage.getItem("token");

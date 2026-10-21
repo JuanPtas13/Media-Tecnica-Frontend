@@ -2,6 +2,7 @@
  * Hook para exportar datos a CSV
  */
 export function useExportCSV() {
+  // Convierte filas de objetos en CSV y descarga el archivo desde el navegador.
   const exportToCSV = (data, filename = "export.csv") => {
     if (!data || data.length === 0) {
       console.warn("No data to export");
@@ -40,6 +41,7 @@ export function useExportCSV() {
     document.body.removeChild(link);
   };
 
+  // Serializa los datos como JSON legible y descarga el archivo localmente.
   const exportToJSON = (data, filename = "export.json") => {
     if (!data) {
       console.warn("No data to export");

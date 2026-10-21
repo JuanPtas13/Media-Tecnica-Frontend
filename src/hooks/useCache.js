@@ -9,6 +9,7 @@ export function useCache(duration = 5 * 60 * 1000) {
   const cacheRef = useRef({});
   const [cacheStats, setCacheStats] = useState({ hits: 0, misses: 0 });
 
+  // Devuelve un valor vigente y actualiza contadores; elimina entradas expiradas.
   const getFromCache = useCallback((key) => {
     const cached = cacheRef.current[key];
 
@@ -26,6 +27,7 @@ export function useCache(duration = 5 * 60 * 1000) {
     return null;
   }, [duration]);
 
+  // Guarda el resultado junto al instante de creación para poder comprobar su vigencia.
   const setInCache = useCallback((key, data) => {
     cacheRef.current[key] = {
       data,
@@ -33,6 +35,7 @@ export function useCache(duration = 5 * 60 * 1000) {
     };
   }, []);
 
+  // Borra una clave específica o vacía todo el caché cuando no se indica una clave.
   const clearCache = useCallback((key = null) => {
     if (key) {
       delete cacheRef.current[key];
@@ -41,6 +44,7 @@ export function useCache(duration = 5 * 60 * 1000) {
     }
   }, []);
 
+  // Cuenta las entradas guardadas sin exponer el objeto interno del caché.
   const getCacheSize = useCallback(() => {
     return Object.keys(cacheRef.current).length;
   }, []);
@@ -63,6 +67,7 @@ export function useCachedApiCall(duration = 5 * 60 * 1000) {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
 
+  // Reutiliza caché cuando existe; de lo contrario consulta, guarda y propaga errores.
   const call = useCallback(
     async (cacheKey, apiFunction, ...args) => {
       // Intentar obtener del caché

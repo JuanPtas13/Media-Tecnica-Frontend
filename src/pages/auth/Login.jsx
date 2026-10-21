@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useLogin } from "../../hooks/useLogin";
 
+// Muestra el formulario inicial y delega autenticación y redirección a useLogin.
 export default function Login() {
   const [email, setEmail] = useState("");
   const [contraseña, setContraseña] = useState("");
   const { loading, error, handleLogin } = useLogin();
 
+  // Evita el envío tradicional del navegador y procesa las credenciales con React.
   const handleSubmit = async (e) => {
     e.preventDefault();
     await handleLogin(email, contraseña);
@@ -87,6 +89,7 @@ export default function Login() {
           </div>
 
           {/* Submit Button */}
+          {/* Cambia from-blue-500/to-indigo-600 para el degradado, bg-blue-400 para carga y hover:shadow-lg para el hover. */}
           <button
             type="submit"
             disabled={loading}

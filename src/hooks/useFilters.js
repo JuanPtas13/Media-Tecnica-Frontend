@@ -10,6 +10,7 @@ export function useFilters(data = [], filterFn = null) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({});
 
+  // Combina la búsqueda textual con filtros personalizados o coincidencias exactas.
   const filtered = useMemo(() => {
     let result = [...data];
 
@@ -39,6 +40,7 @@ export function useFilters(data = [], filterFn = null) {
     return result;
   }, [data, searchTerm, filters, filterFn]);
 
+  // Elimina de una vez el término de búsqueda y todos los filtros seleccionados.
   const clearFilters = useCallback(() => {
     setSearchTerm("");
     setFilters({});

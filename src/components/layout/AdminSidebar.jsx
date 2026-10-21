@@ -9,6 +9,7 @@ export default function AdminSidebar({ isOpen, onToggle }) {
   const location = useLocation();
   const { logout, user } = useAuth();
 
+  // Marca el enlace actual comparando la URL del navegador con la ruta del panel.
   const isActive = (path) => {
     return location.pathname.startsWith(`/admin${path}`);
   };

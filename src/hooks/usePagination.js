@@ -23,27 +23,33 @@ export function usePagination(items, itemsPerPage = 10) {
     return items.slice(startIndex, endIndex);
   }, [items, validPage, itemsPerPage]);
 
+  // Cambia a una página válida, limitando el número entre 1 y la última página.
   const goToPage = useCallback((page) => {
     const pageNum = Math.max(1, Math.min(page, totalPages || 1));
     setCurrentPage(pageNum);
   }, [totalPages]);
 
+  // Avanza una página; goToPage evita superar el total.
   const nextPage = useCallback(() => {
     goToPage(validPage + 1);
   }, [validPage, goToPage]);
 
+  // Retrocede una página; goToPage evita quedar antes de la primera.
   const prevPage = useCallback(() => {
     goToPage(validPage - 1);
   }, [validPage, goToPage]);
 
+  // Lleva directamente al comienzo de la lista.
   const firstPage = useCallback(() => {
     setCurrentPage(1);
   }, []);
 
+  // Lleva directamente a la última página calculada.
   const lastPage = useCallback(() => {
     setCurrentPage(totalPages || 1);
   }, [totalPages]);
 
+  // Reinicia la paginación cuando cambian los datos o los filtros.
   const resetPagination = useCallback(() => {
     setCurrentPage(1);
   }, []);
@@ -104,6 +110,7 @@ export function useSorting(items, defaultKey = null, defaultOrder = "asc") {
     return sorted;
   }, [items, sortKey, sortOrder]);
 
+  // Alterna ascendente/descendente o inicia ascendente al elegir otra columna.
   const toggleSort = useCallback((key) => {
     if (sortKey === key) {
       // Toggle order si es la misma columna
@@ -115,6 +122,7 @@ export function useSorting(items, defaultKey = null, defaultOrder = "asc") {
     }
   }, [sortKey, sortOrder]);
 
+  // Restaura la columna y el sentido de ordenamiento iniciales.
   const resetSort = useCallback(() => {
     setSortKey(defaultKey);
     setSortOrder(defaultOrder);
@@ -138,6 +146,7 @@ export function usePaginationAndSort(
   defaultSortKey = null,
   defaultSortOrder = "asc"
 ) {
+  // Combina ambos hooks para que la página actual se calcule sobre datos ordenados.
   const { sortedItems, ...sorting } = useSorting(items, defaultSortKey, defaultSortOrder);
   const { ...pagination } = usePagination(sortedItems, itemsPerPage);
 

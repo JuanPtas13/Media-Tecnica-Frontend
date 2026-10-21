@@ -14,6 +14,7 @@ export default function ConfirmModal({
 }) {
   if (!isOpen) return null;
 
+  // Estas clases controlan el color de confirmación; actualízalas para cambiar cada variante.
   const variantStyles = {
     danger: {
       button: "bg-red-600 hover:bg-red-700",

@@ -99,6 +99,7 @@ export const validators = {
  * Hook para validación de formularios
  */
 export const useValidation = () => {
+  // Ejecuta un validador único o una lista y devuelve el primer error encontrado.
   const validate = (value, validator) => {
     if (typeof validator === "function") {
       return validator(value);

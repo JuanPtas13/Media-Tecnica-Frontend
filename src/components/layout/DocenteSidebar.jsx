@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+// Presenta la navegación docente y el acceso para cerrar la sesión.
 export default function DocenteSidebar({ isOpen, onToggle }) {
   const location = useLocation();
   const { logout, user } = useAuth();
 
+  // Comprueba si la ruta actual pertenece al enlace para resaltar el menú activo.
   const isActive = (path) => location.pathname.startsWith(`/docente${path}`);
 
   const menuItems = [
@@ -66,6 +68,7 @@ export default function DocenteSidebar({ isOpen, onToggle }) {
               <p className="text-xs text-gray-500 truncate">{user.email}</p>
             </div>
           )}
+          {/* Cambia bg-red-50/text-red-600 para el color normal y hover:bg-red-100 para el hover. */}
           <button
             onClick={logout}
             className="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-200 font-medium text-sm"
